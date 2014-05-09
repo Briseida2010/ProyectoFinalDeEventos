@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9837ede3-ee75-4d83-bad5-8dbf8fdd709c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[CALL `sp_S_ComisionEvento`('1')]]>
+	</queryString>
+	<field name="idPersona" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nombrecompleto" class="java.lang.String"/>
+	<field name="tipoevento" class="java.lang.String"/>
+	<field name="tipocomision" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="147" y="24" width="241" height="20" uuid="15c82aec-3799-41b9-be45-848f6d78ca48"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE DE LAS COMISIONES POR EVENTO]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="0" width="100" height="20" uuid="b72fcd80-823c-437a-a715-55896d956b17"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm a">
+				<reportElement x="455" y="0" width="100" height="20" uuid="d7330d81-f9a6-48a1-b9e9-084916c9f684"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="13" y="0" width="100" height="20" uuid="3c7f1523-4c01-4327-95c6-396c44eb37bd"/>
+				<text><![CDATA[idPersona]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="135" y="2" width="100" height="20" uuid="b7d9dd5c-47a7-4a6b-9a45-98680edb0e43"/>
+				<text><![CDATA[nombrecompleto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="256" y="2" width="100" height="20" uuid="2c3a78fe-8ef8-4823-a954-f0896c9a8d84"/>
+				<text><![CDATA[tipoevento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="2" width="100" height="20" uuid="a0adfaca-9f3b-4f01-99a1-038b1aa5b94c"/>
+				<text><![CDATA[tipocomision]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<textField>
+				<reportElement x="13" y="10" width="100" height="20" uuid="6dc42685-a8af-4fdb-b9ad-f2df9ee573bd"/>
+				<textFieldExpression><![CDATA[$F{idPersona}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="135" y="10" width="100" height="20" uuid="4a3c3915-9f02-4eed-a68b-d3e62dcce76f"/>
+				<textFieldExpression><![CDATA[$F{nombrecompleto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="256" y="10" width="100" height="20" uuid="96c71594-dd4c-4942-9565-99a76100e5cd"/>
+				<textFieldExpression><![CDATA[$F{tipoevento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="10" width="100" height="20" uuid="616a8f60-6ef7-4330-9392-13666c590e2c"/>
+				<textFieldExpression><![CDATA[$F{tipocomision}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
