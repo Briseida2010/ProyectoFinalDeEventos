@@ -66,7 +66,6 @@ public class frmLogin extends javax.swing.JFrame {
         });
         getContentPane().add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 310, 160, 50));
 
-        jLabel3.setIcon(new javax.swing.ImageIcon("F:\\ProyectoFinal_EventoV4\\Sistema_Eventos\\src\\img\\login.png")); // NOI18N
         jLabel3.setText("jLabel3");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 340, 370));
 

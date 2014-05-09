@@ -20,7 +20,7 @@ public class clsPrograma {
             
     public static void agregarPrograma (clsEntidadPrograma objPrograma){
         try{
-            CallableStatement statement = cnx.prepareCall("{call sp_I_Programa(?,?,?,?,?,?,?,?,?,?,?,?)}");
+            CallableStatement statement = cnx.prepareCall("{call sp_I_Programa(?,?,?,?,?)}");
             statement = asignarValores(statement,objPrograma);
             statement.execute();
         }catch(SQLException ex){
@@ -31,7 +31,6 @@ public class clsPrograma {
     public static void modificarPrograma (clsEntidadPrograma objPrograma){
         try{
             CallableStatement statement = cnx.prepareCall("{call sp_U_Programa(?,?,?,?,?)}");
-            statement.setInt("pidevento", objPrograma.getIdPersona());
             statement = asignarValores(statement,objPrograma);
             statement.executeUpdate();
         }catch(SQLException ex){
@@ -39,20 +38,46 @@ public class clsPrograma {
         }
     }
     
-    public static ArrayList<clsEntidadPrograma> listarProgramas(String busqueda){
+    public static ArrayList<clsEntidadPersona> listarPonentesNoInscritos(String pbusqueda,int idEvento){
+       ArrayList<clsEntidadPersona> listaPersonas = new ArrayList<clsEntidadPersona>();
+        try{
+            ResultSet rs;
+            CallableStatement statement = cnx.prepareCall("{call sp_S_PonenteEvento(?,?)}");
+            statement.setString("pbusqueda", pbusqueda);
+            statement.setInt("pidEvento", idEvento);
+            rs = statement.executeQuery();          
+            while(rs.next()){
+                clsEntidadPersona objPersona = new clsEntidadPersona();
+                objPersona.setIdPersona(rs.getInt("idPersona"));
+                objPersona.setNombres(rs.getString("nombres"));
+                objPersona.setApellidos(rs.getString("apellidos"));
+                objPersona.setEmail(rs.getString("email"));
+                
+                listaPersonas.add(objPersona);
+            }
+        }catch(SQLException ex){
+            ex.printStackTrace();
+        }
+        return listaPersonas;     
+    }
+    
+    public static ArrayList<clsEntidadPrograma> listarProgramas(String busqueda,int Evento){
         ArrayList<clsEntidadPrograma> listaProgramas = new ArrayList<clsEntidadPrograma>();
         try{
             ResultSet rs;
-            CallableStatement statement = cnx.prepareCall("{call sp_S_Programa(?)}");
+            CallableStatement statement = cnx.prepareCall("{call sp_S_Programa(?,?)}");
             statement.setString("pbusqueda", busqueda);
+            statement.setInt("pidEvento", Evento);
             rs = statement.executeQuery();          
             while(rs.next()){
                 clsEntidadPrograma objPrograma = new clsEntidadPrograma();
                 objPrograma.setIdEvento(rs.getInt("idEvento"));
                 objPrograma.setIdPersona(rs.getInt("idPersona"));
+                objPrograma.setNombre(rs.getString("nombre"));
                 objPrograma.setTema(rs.getString("tema"));
                 objPrograma.setFechaInicio(rs.getString("fechaInicio"));
                 objPrograma.setFechaFinal(rs.getString("fechaFinal"));
+                
                 listaProgramas.add(objPrograma);
             }
         }catch(SQLException ex){
@@ -62,9 +87,11 @@ public class clsPrograma {
     }
     
     private static CallableStatement asignarValores(CallableStatement statement, clsEntidadPrograma objPrograma) throws SQLException{
-        statement.setString("tema", objPrograma.getTema());
-        statement.setString("fechaInicio", objPrograma.getFechaInicio());
-        statement.setString("fechaFinal", objPrograma.getFechaFinal());
+        statement.setInt("pidEvento", objPrograma.getIdEvento());
+        statement.setInt("pidPersona", objPrograma.getIdPersona());
+        statement.setString("ptema", objPrograma.getTema());
+        statement.setString("pfechaInicio", objPrograma.getFechaInicio());
+        statement.setString("pfechaFinal", objPrograma.getFechaFinal());
         return statement;
     }
     

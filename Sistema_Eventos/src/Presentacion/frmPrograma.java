@@ -16,68 +16,91 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Juan
  */
-public class frmPrograma extends javax.swing.JInternalFrame implements IMantenimiento{
+public class frmPrograma extends javax.swing.JInternalFrame implements IFormulario{
 
     ArrayList<clsEntidadPrograma> listaPrograma;  
     clsEntidadPrograma _objPrograma;
+    clsEntidadEvento _objEvento;
+    int idEvento;
+    int idPersona;
     boolean isNuevoActivo;
     
     public frmPrograma() {
         initComponents();
-        cargarTabla("");
         FrmMaster.BloquearControles(pnlForm);
         FrmMaster.BloquearBotones(pnlForm, "Cancelar");
     }
     
     @Override
-    public void cargarTabla(String busqueda){
-        listaPrograma = clsPrograma.listarProgramas(busqueda);
+    public void seleccionarUsuario(clsEntidadPersona objPersona){
+        txtPersona.setText(objPersona.getNombres()+" "+objPersona.getApellidos());
+        idPersona = objPersona.getIdPersona();
+    }
+    
+    @Override
+    public void seleccionarEvento(clsEntidadEvento objEvento){
+        txtEvento.setText(objEvento.getTitulo());
+        txtTipoEvento.setText(objEvento.getTipo());
+        idEvento = objEvento.getIdEvento();
+        _objEvento = objEvento;
+        cargarTabla("",idEvento);
+    }
+    
+  
+    public void cargarTabla(String busqueda,int idEvento){
+        listaPrograma = clsPrograma.listarProgramas(busqueda,idEvento);
         DefaultTableModel dtm = (DefaultTableModel)tblPrograma.getModel();
         FrmMaster.limpiarTabla(tblPrograma);
         for(clsEntidadPrograma objPrograma : listaPrograma){
             Object[] fila = new Object[15];
             fila[0] = objPrograma.getIdEvento();
             fila[1] = objPrograma.getIdPersona();
-            fila[2] = objPrograma.getTema();
-            fila[3] = objPrograma.getFechaInicio();
-            fila[4] = objPrograma.getFechaFinal();
+            fila[2] = objPrograma.getNombre();
+            fila[3] = objPrograma.getTema();
+            fila[4] = objPrograma.getFechaInicio();
+            fila[5] = objPrograma.getFechaFinal();
             dtm.addRow(fila);
         }
         tblPrograma.setModel(dtm);
     }
     
-    @Override
+   
     public void seleccionarTabla(){
         int fila = tblPrograma.getSelectedRow();
         if (fila==-1){
             JOptionPane.showMessageDialog(null, "Debes seleccionar una fila");
         }else{
+            _objPrograma = listaPrograma.get(fila);
+            idPersona = _objPrograma.getIdPersona();
+            txtPersona.setText(_objPrograma.getNombre());
             txtTema.setText(_objPrograma.getTema());
             txtFechainicio.setText(_objPrograma.getFechaInicio());
             txtFechafin.setText(_objPrograma.getFechaFinal());
         }
     }
     
-    @Override
+   
     public void guardar(){
         clsEntidadPrograma objPrograma = new clsEntidadPrograma();
+        objPrograma.setIdEvento(idEvento);
+        objPrograma.setIdPersona(idPersona);
         objPrograma.setTema(txtTema.getText());
         objPrograma.setFechaInicio(txtFechainicio.getText());
         objPrograma.setFechaFinal(txtFechafin.getText());
         clsPrograma.agregarPrograma(objPrograma);
-        cargarTabla("");
+        cargarTabla("",idEvento);
     }
     
-    @Override
+   
     public void modificar() {
         clsEntidadPrograma objPrograma = new clsEntidadPrograma();
-        objPrograma.setIdEvento(_objPrograma.getIdEvento());
-        objPrograma.setIdPersona(_objPrograma.getIdPersona());
+        objPrograma.setIdEvento(idEvento);
+        objPrograma.setIdPersona(idPersona);
         objPrograma.setTema(txtTema.getText());
         objPrograma.setFechaInicio(txtFechainicio.getText());
         objPrograma.setFechaFinal(txtFechafin.getText());
         clsPrograma.modificarPrograma(objPrograma);
-        cargarTabla("");
+        cargarTabla("",idEvento);
     }
 
     /**
@@ -90,16 +113,20 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
     private void initComponents() {
 
         pnlForm = new javax.swing.JPanel();
-        jLabel11 = new javax.swing.JLabel();
-        txtEvento = new javax.swing.JTextField();
-        txtPersona = new javax.swing.JPasswordField();
-        jLabel4 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         txtTema = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         txtFechainicio = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         txtFechafin = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        txtPersona = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        txtEvento = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        txtTipoEvento = new javax.swing.JTextField();
         pnlBotones = new javax.swing.JPanel();
         btnModificar = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
@@ -116,32 +143,59 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
         pnlForm.setBackground(new java.awt.Color(255, 255, 255));
         pnlForm.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel11.setText("Nombre Evento :");
-        pnlForm.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
-        pnlForm.add(txtEvento, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 100, -1));
-        pnlForm.add(txtPersona, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 40, 100, -1));
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel4.setText("Nombre Persona :");
-        pnlForm.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
-
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel9.setText("Tema :");
-        pnlForm.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
-        pnlForm.add(txtTema, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, 100, -1));
+        pnlForm.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, -1, -1));
+        pnlForm.add(txtTema, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 110, 100, -1));
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel10.setText("Fecha de Inicio :");
-        pnlForm.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, -1, -1));
-        pnlForm.add(txtFechainicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 100, 100, -1));
+        pnlForm.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, -1, -1));
+        pnlForm.add(txtFechainicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 100, -1));
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel12.setText("Fecha de Culminacion :");
-        pnlForm.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, -1, -1));
-        pnlForm.add(txtFechafin, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 130, 100, -1));
+        pnlForm.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, -1, -1));
+        pnlForm.add(txtFechafin, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 170, 100, -1));
 
-        getContentPane().add(pnlForm, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 320, 180));
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel11.setText("Persona :");
+        pnlForm.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, -1, -1));
+
+        jButton2.setText("B");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        pnlForm.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 80, 40, -1));
+
+        txtPersona.setEditable(false);
+        pnlForm.add(txtPersona, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 80, 270, -1));
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel4.setText("Tipo Evento :");
+        pnlForm.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
+
+        jButton1.setText("B");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        pnlForm.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 50, 40, -1));
+
+        txtEvento.setEditable(false);
+        pnlForm.add(txtEvento, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 50, 270, -1));
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel3.setText("Titulo :");
+        pnlForm.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, -1, -1));
+
+        txtTipoEvento.setEditable(false);
+        pnlForm.add(txtTipoEvento, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 100, -1));
+
+        getContentPane().add(pnlForm, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 520, 220));
 
         pnlBotones.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -210,7 +264,7 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
                 .addGap(40, 40, 40))
         );
 
-        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, -1, 190));
+        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 60, -1, 190));
 
         jLabel1.setText("Mantenimiento de Programa");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 189, -1));
@@ -220,7 +274,7 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
 
             },
             new String [] {
-                "idEvento", "idPersona", "Tema", "Fecha de Inicio", "Fecha de Culminacion"
+                "idEvento", "idPersona", "Nombre Ponente", "Tema", "Fecha de Inicio", "Fecha de Culminacion"
             }
         ));
         tblPrograma.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -229,10 +283,15 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
             }
         });
         jScrollPane1.setViewportView(tblPrograma);
+        if (tblPrograma.getColumnModel().getColumnCount() > 0) {
+            tblPrograma.getColumnModel().getColumn(0).setMinWidth(0);
+            tblPrograma.getColumnModel().getColumn(0).setMaxWidth(0);
+            tblPrograma.getColumnModel().getColumn(1).setMinWidth(0);
+            tblPrograma.getColumnModel().getColumn(1).setMaxWidth(0);
+        }
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 500, 180));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 290, 660, 180));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon("F:\\ProyectoFinal_EventoV4\\Sistema_Eventos\\src\\img\\fondobriseida.png")); // NOI18N
         jLabel2.setText("jLabel2");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 600, 480));
 
@@ -240,7 +299,7 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        if(tblPrograma.getSelectedRow()>0){
+        if(tblPrograma.getSelectedRow()>=0){
             isNuevoActivo=false;
             FrmMaster.HabilitarControles(pnlForm);
             FrmMaster.BloquearBotones(pnlBotones, "Modificar");
@@ -259,6 +318,8 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
         FrmMaster.BloquearBotones(pnlBotones, "Guardar");
         FrmMaster.LimpiarCampos(pnlForm);
         FrmMaster.BloquearControles(pnlForm);
+        txtTipoEvento.setText(_objEvento.getTipo());
+        txtEvento.setText(_objEvento.getTitulo());
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
@@ -282,18 +343,33 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
         seleccionarTabla();
     }//GEN-LAST:event_tblProgramaMouseClicked
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        frmBuscarEvento objBuscarEvento = new frmBuscarEvento(this);
+        MDIPrincipal.Escritorio1.add(objBuscarEvento);
+        objBuscarEvento.show();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        frmBuscarPonente objBuscarPersona = new frmBuscarPonente(this,idEvento);
+        MDIPrincipal.Escritorio1.add(objBuscarPersona);
+        objBuscarPersona.show();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnNuevo;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
@@ -303,7 +379,8 @@ public class frmPrograma extends javax.swing.JInternalFrame implements IMantenim
     private javax.swing.JTextField txtEvento;
     private javax.swing.JTextField txtFechafin;
     private javax.swing.JTextField txtFechainicio;
-    private javax.swing.JPasswordField txtPersona;
+    private javax.swing.JTextField txtPersona;
     private javax.swing.JTextField txtTema;
+    private javax.swing.JTextField txtTipoEvento;
     // End of variables declaration//GEN-END:variables
 }

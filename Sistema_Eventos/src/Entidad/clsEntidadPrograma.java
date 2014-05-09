@@ -10,6 +10,15 @@ package Entidad;
 public class clsEntidadPrograma {
     int idEvento;
     int idPersona;
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    String nombre;
     String tema;
     String fechaInicio;
     String fechaFinal;

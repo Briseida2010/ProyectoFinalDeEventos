@@ -7,44 +7,56 @@
 package Presentacion;
 import Entidad.*;
 import Negocio.*;
-import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author BEPIS
  */
-public class frmInscripcion extends javax.swing.JInternalFrame {
+public class frmInscripcion extends javax.swing.JInternalFrame implements IFormulario{
 
     ArrayList<clsEntidadInscripcion> listaInscripcion;  
     clsEntidadInscripcion _objInscripcion;
+    clsEntidadEvento _objEvento;
     boolean isNuevoActivo;
+    int idPersona;
+    int idEvento;
     
     ArrayList<clsEntidadEvento> listaEvento;
     ArrayList<clsEntidadPersona> listaPersona;
     public frmInscripcion() {
         initComponents();
-        cargarCombo1();
-        cargarCombo();
-        cargarTabla("");
         FrmMaster.BloquearControles(pnlForm);
         FrmMaster.BloquearBotones(pnlForm, "Cancelar");
     }
-
- 
-    public void cargarTabla(String busqueda){
-        listaInscripcion = clsInscripcion.listarInscripcion(busqueda);
+    
+    
+    public void seleccionarUsuario(clsEntidadPersona objPersona){
+        txtPersona.setText(objPersona.getNombres()+" "+objPersona.getApellidos());
+        idPersona = objPersona.getIdPersona();
+    }
+    
+    public void seleccionarEvento(clsEntidadEvento objEvento){
+        txtEvento.setText(objEvento.getTitulo());
+        txtTipoEvento.setText(objEvento.getTipo());
+        idEvento = objEvento.getIdEvento();
+        _objEvento = objEvento;
+        cargarTabla(idEvento);
+    }
+    
+    public void cargarTabla(int idEvento){
+        listaInscripcion = clsInscripcion.listarInscripcion(idEvento);
         DefaultTableModel dtm = (DefaultTableModel)tblInscripcion.getModel();
         FrmMaster.limpiarTabla(tblInscripcion);
         for(clsEntidadInscripcion objInscripcion : listaInscripcion){
-            Object[] fila = new Object[15];
+            Object[] fila = new Object[6];
             fila[0] = objInscripcion.getIdPersona();
             fila[1] = objInscripcion.getIdEvento();
-            fila[2] = objInscripcion.getTipoPago();
-            fila[3] = objInscripcion.getMonto();
-            fila[4] = objInscripcion.getFecha();
+            fila[2] = objInscripcion.getNombre();
+            fila[3] = objInscripcion.getTipoPago();
+            fila[4] = objInscripcion.getMonto();
+            fila[5] = objInscripcion.getFecha();
 
 
             dtm.addRow(fila);
@@ -52,71 +64,45 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         tblInscripcion.setModel(dtm);
     }
     
-    public void cargarCombo(){
-        listaEvento = clsEvento.listarEventos("");
-        DefaultComboBoxModel dtm = new DefaultComboBoxModel();
-        dtm.addElement("Seleccione el titulo");
-        for(clsEntidadEvento objEvento : listaEvento){
-           String evento = objEvento.getTitulo();
-            System.out.println(objEvento.getTitulo());
-            dtm.addElement(evento);
-        }
-        cmbTituloEvento.setModel(dtm);
-    }
-    
-    public void cargarCombo1(){
-        listaPersona = clsPersona.listarPersonas("");
-        DefaultComboBoxModel dtm = new DefaultComboBoxModel();
-        dtm.addElement("Seleccione el titulo");
-        for(clsEntidadPersona objPersona : listaPersona){
-           String persona = objPersona.getNombres();
-            System.out.println(objPersona.getNombres());
-            dtm.addElement(persona);
-        }
-        cmbPersona.setModel(dtm);
-    }
-    
-    
-    
-    
     public void seleccionarTabla(){
         int fila = tblInscripcion.getSelectedRow();
+        _objInscripcion = listaInscripcion.get(fila);
         if (fila==-1){
             JOptionPane.showMessageDialog(null, "Debes seleccionar una fila");
         }else{
-            txtTipopago.setText(_objInscripcion.getTipoPago());
+            
+            cboTipoPago.setSelectedItem(_objInscripcion.getTipoPago());
             txtMonto.setText(String.valueOf(_objInscripcion.getMonto()));
             txtFecha.setText(String.valueOf(_objInscripcion.getFecha()));
+            idPersona = _objInscripcion.getIdPersona();
+            idEvento = _objInscripcion.getIdEvento();
+            txtPersona.setText(_objInscripcion.getNombre());
         }
     }
     
 
     public void guardar(){
         clsEntidadInscripcion objInscripcion = new clsEntidadInscripcion();
-        clsEntidadEvento evento = obtenerTituloEventoSeleccionado();
-       clsEntidadPersona persona = obtenerPersonaSeleccionado();
-       int idEvento = evento.getIdEvento();
-       int idPersona = persona.getIdPersona();
-       objInscripcion.setIdEvento(idEvento);
-       objInscripcion.setIdPersona(idPersona);
-        objInscripcion.setTipoPago(txtTipopago.getText());
+        objInscripcion.setIdEvento(idEvento);
+        objInscripcion.setIdPersona(idPersona);
+        objInscripcion.setTipoPago(String.valueOf(cboTipoPago.getSelectedItem()));
         objInscripcion.setMonto(Double.parseDouble(txtMonto.getText()));
         objInscripcion.setFecha(txtFecha.getText());
         clsInscripcion.agregarInscripcion(objInscripcion);
-       // cargarTabla("");
-        
-      
+        JOptionPane.showMessageDialog(null, "Inscripcion guardada!");
+        cargarTabla(idEvento);      
     }
     
    
     public void modificar() {
         clsEntidadInscripcion objInscripcion = new clsEntidadInscripcion();
-        objInscripcion.setIdPersona(_objInscripcion.getIdPersona());
-        objInscripcion.setIdEvento(_objInscripcion.getIdEvento());
-        objInscripcion.setTipoPago(txtTipopago.getText());
+        objInscripcion.setIdEvento(idEvento);
+        objInscripcion.setIdPersona(idPersona);
+        objInscripcion.setTipoPago(String.valueOf(cboTipoPago.getSelectedItem()));
+        objInscripcion.setFecha(txtFecha.getText());
         objInscripcion.setMonto(Double.parseDouble(txtMonto.getText()));
         clsInscripcion.modificarInscripcion(objInscripcion);
-       // cargarTabla("");
+        cargarTabla(idEvento);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -140,16 +126,17 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        txtTipopago = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         txtMonto = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        cmbTituloEvento = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
         txtFecha = new javax.swing.JTextField();
         txtTipoEvento = new javax.swing.JTextField();
-        cmbPersona = new javax.swing.JComboBox();
-        txtApellido = new javax.swing.JTextField();
+        txtEvento = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        txtPersona = new javax.swing.JTextField();
+        cboTipoPago = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
 
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -159,7 +146,7 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "idPersona", "idEvento", "Tipo Pago", "Monto", "Fecha"
+                "idPersona", "idEvento", "Nombre Persona", "Tipo Pago", "Monto", "Fecha"
             }
         ));
         tblInscripcion.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -168,11 +155,17 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
             }
         });
         jScrollPane1.setViewportView(tblInscripcion);
+        if (tblInscripcion.getColumnModel().getColumnCount() > 0) {
+            tblInscripcion.getColumnModel().getColumn(0).setMinWidth(0);
+            tblInscripcion.getColumnModel().getColumn(0).setMaxWidth(0);
+            tblInscripcion.getColumnModel().getColumn(1).setMinWidth(0);
+            tblInscripcion.getColumnModel().getColumn(1).setMaxWidth(0);
+        }
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 480, 180));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 650, 180));
 
         jLabel1.setText("Mantenimiento de Inscripcion");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 20, 150, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 20, 190, -1));
 
         pnlBotones.setBackground(new java.awt.Color(255, 255, 255));
         pnlBotones.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -217,7 +210,7 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         });
         pnlBotones.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 144, 90, -1));
 
-        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 80, 110, 180));
+        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 70, 110, 180));
 
         pnlForm.setBackground(new java.awt.Color(255, 255, 255));
         pnlForm.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -233,7 +226,6 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel9.setText("Tipo Pago :");
         pnlForm.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
-        pnlForm.add(txtTipopago, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 120, 100, -1));
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel10.setText("Monto :");
@@ -243,31 +235,42 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         jLabel3.setText("Titulo :");
         pnlForm.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, -1, -1));
 
-        cmbTituloEvento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbTituloEventoActionPerformed(evt);
-            }
-        });
-        pnlForm.add(cmbTituloEvento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 100, -1));
-
         jLabel5.setText("Fecha :");
         pnlForm.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, -1, -1));
         pnlForm.add(txtFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 100, -1));
+
+        txtTipoEvento.setEditable(false);
         pnlForm.add(txtTipoEvento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, 100, -1));
 
-        cmbPersona.addActionListener(new java.awt.event.ActionListener() {
+        txtEvento.setEditable(false);
+        pnlForm.add(txtEvento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 270, -1));
+
+        jButton1.setText("B");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbPersonaActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
-        pnlForm.add(cmbPersona, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 100, -1));
-        pnlForm.add(txtApellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 80, 100, -1));
+        pnlForm.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 50, 40, -1));
 
-        getContentPane().add(pnlForm, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 360, 210));
+        jButton2.setText("B");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        pnlForm.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 80, 40, -1));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon("F:\\ProyectoFinal_EventoV4\\Sistema_Eventos\\src\\img\\fondobriseida.png")); // NOI18N
+        txtPersona.setEditable(false);
+        pnlForm.add(txtPersona, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 270, -1));
+
+        cboTipoPago.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Pagado", "Pendiente", "Gratis" }));
+        pnlForm.add(cboTipoPago, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 120, 200, -1));
+
+        getContentPane().add(pnlForm, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 480, 210));
+
         jLabel2.setText("jLabel2");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 600, 470));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 690, 470));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -277,7 +280,7 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tblInscripcionMouseClicked
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        if(tblInscripcion.getSelectedRow()>0){
+        if(tblInscripcion.getSelectedRow()>=0){
             isNuevoActivo=false;
             FrmMaster.HabilitarControles(pnlForm);
             FrmMaster.BloquearBotones(pnlBotones, "Modificar");
@@ -295,6 +298,8 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         FrmMaster.BloquearBotones(pnlBotones, "Guardar");
         FrmMaster.LimpiarCampos(pnlForm);
         FrmMaster.BloquearControles(pnlForm);
+        txtTipoEvento.setText(_objEvento.getTipo());
+        txtEvento.setText(_objEvento.getTitulo());
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
@@ -314,53 +319,27 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
         this.dispose();
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void cmbTituloEventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTituloEventoActionPerformed
-        // TODO add your handling code here:
-        if(cmbTituloEvento.getSelectedIndex()>0){
-            clsEntidadEvento evento = obtenerTituloEventoSeleccionado();
-            int idEvento = evento.getIdEvento();
-            String tipo = String.valueOf(evento.getTipo());
-            txtTipoEvento.setText(tipo);
-            //cargarTabla(idEvente);
-        }else{
-            FrmMaster.LimpiarCampos(pnlForm);
-            //FrmMaster.limpiarTabla(tblKardex);
-        }
-    }//GEN-LAST:event_cmbTituloEventoActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        frmBuscarPersona objBuscarPersona = new frmBuscarPersona(this,idEvento);
+        MDIPrincipal.Escritorio1.add(objBuscarPersona);
+        objBuscarPersona.show();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void cmbPersonaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPersonaActionPerformed
-        // TODO add your handling code here:
-        if(cmbPersona.getSelectedIndex()>0){
-            clsEntidadPersona persona = obtenerPersonaSeleccionado();
-            int idPersona = persona.getIdPersona();
-            String apellido = String.valueOf(persona.getApellidos());
-            txtApellido.setText(apellido);
-            //cargarTabla(idEvente);
-        }else{
-            FrmMaster.LimpiarCampos(pnlForm);
-            //FrmMaster.limpiarTabla(tblKardex);
-        }
-    }//GEN-LAST:event_cmbPersonaActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        frmBuscarEvento objBuscarEvento = new frmBuscarEvento(this);
+        MDIPrincipal.Escritorio1.add(objBuscarEvento);
+        objBuscarEvento.show();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
-    private clsEntidadEvento obtenerTituloEventoSeleccionado(){
-        int indexCmbArticulo = cmbTituloEvento.getSelectedIndex();
-        clsEntidadEvento evento = listaEvento.get(indexCmbArticulo-1);
-        return evento;
-    }
     
-    private clsEntidadPersona obtenerPersonaSeleccionado(){
-        int indexCmbPersona = cmbPersona.getSelectedIndex();
-        clsEntidadPersona persona = listaPersona.get(indexCmbPersona-1);
-        return persona;
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnNuevo;
-    private javax.swing.JComboBox cmbPersona;
-    private javax.swing.JComboBox cmbTituloEvento;
+    private javax.swing.JComboBox cboTipoPago;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -374,10 +353,12 @@ public class frmInscripcion extends javax.swing.JInternalFrame {
     private javax.swing.JPanel pnlBotones;
     private javax.swing.JPanel pnlForm;
     private javax.swing.JTable tblInscripcion;
-    private javax.swing.JTextField txtApellido;
+    private javax.swing.JTextField txtEvento;
     private javax.swing.JTextField txtFecha;
     private javax.swing.JTextField txtMonto;
+    private javax.swing.JTextField txtPersona;
     private javax.swing.JTextField txtTipoEvento;
-    private javax.swing.JTextField txtTipopago;
     // End of variables declaration//GEN-END:variables
+
+
 }

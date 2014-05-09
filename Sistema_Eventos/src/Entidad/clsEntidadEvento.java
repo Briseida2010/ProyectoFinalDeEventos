@@ -10,12 +10,14 @@ package Entidad;
 public class clsEntidadEvento {
     
     int idEvento;
+
     String tipo;
     String fechaInicio;
     String fechaFinal;
     String lugar;
     String titulo;
 
+ 
     public String getLugar() {
         return lugar;
     }
